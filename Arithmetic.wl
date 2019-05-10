@@ -16,7 +16,9 @@ minAndPosCompiled = Compile[{{list, _Real, 1}},
 	], CompilationTarget -> "C", RuntimeOptions-> "Speed"
 ];
 
-MinAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[minAndPosCompiled[list]];
+minAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[minAndPosCompiled[list]];
+
+MinAndPosition := minAndPosition;
 
 
 PackageExport["MaxAndPosition"]
