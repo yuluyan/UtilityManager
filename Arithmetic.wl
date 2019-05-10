@@ -35,4 +35,6 @@ maxAndPosCompiled = Compile[{{list, _Real, 1}},
 	], CompilationTarget -> "C", RuntimeOptions-> "Speed"
 ];
 
-MaxAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[maxAndPosCompiled[list]];
+maxAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[maxAndPosCompiled[list]];
+
+MaxAndPosition := maxAndPosition;
