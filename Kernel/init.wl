@@ -24,8 +24,12 @@ $commitsURL = "https://api.github.com/repos/" <> $githubUser <> "/" <> $githubRe
 $downloadURL = "https://github.com/" <> $githubUser <> "/" <> $githubRepo <> "/archive/master.zip";
 
 (* update from github *)
+checkUpdate::timeout = "Update checking timed out, please try again.";
 checkUpdate[] := Module[{verFile, localVer, json, latest},
-	json = Import[$commitsURL, "JSON"];
+	json = TimeConstrained[
+		Import[$commitsURL,"JSON"], 0.1,
+		Message[checkUpdate::timeout]; Return[{False, ""}]
+	];
 	latest = Lookup[First @ json, "sha"];
 	verFile = FileNameJoin[{$basePath, "latest.sha"}];
 	{If[!FileExistsQ[verFile], True,
