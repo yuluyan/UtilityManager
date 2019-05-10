@@ -8,7 +8,6 @@ PreemptProtect @ Quiet[
 
 (* load dependancies *)
 
-TakeDrop; (* This causes loading of Language`PairFunctions` *)
 Needs["GeneralUtilities`"];
 
 $umSymbols = GeneralUtilities`ClearPacletExportedSymbols["UtilityManager"];
@@ -84,10 +83,10 @@ initializeManager[] := (
 	$allFiles = Select[FileNames["*.wl", $basePath, Infinity], GeneralUtilities`FileQ];
 	$ignoreFiles = Flatten @ {
 		FileNames["*.wl", subPath /@ {".git"}, Infinity],
-		{subPath["Kernel", "init.wl"], subPath["README.md"], subPath["LICENSE"]}
+		{subPath["Kernel", "init.wl"], subPath["PacletInfo.m"],subPath["README.md"], subPath["LICENSE"]}
 	};
 	$files = Complement[$allFiles, $ignoreFiles];
-	
+
 	(* scan for scoped and exported symbols *)
 	$lines = StringSplit[StringTrim @ FindList[$files, {"PackageScope", "PackageExport"}], {"[", "]", "\""}];
 	$private = Cases[$lines, {"PackageScope", _, name_} :> name];
@@ -134,7 +133,6 @@ initializeManager[] := (
 	];
 	
 	$contexts = {"System`", "Developer`", "Internal`", "GeneralUtilities`", "UtilityManager`", "UtilityManager`Private`"};
-	
 	Block[{$ContextPath = $contexts}, 
 		(* load all the ordinary .wl code files *)
 		GeneralUtilities`CatchFailure[General, Scan[loadFile, $files]];
