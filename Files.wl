@@ -16,16 +16,16 @@ saveImg::nosave = "Please specify the location to save or save the notebook.";
 SetAttributes[saveImg, HoldFirst];
 Options[saveImg] = {ImageSize -> Automatic};
 saveImg[g_, ext_, OptionsPattern[]] := (
-	If[!DirectoryQ[$SaveImagePath], 
+	If[FailureQ[$SaveImagePath], 
 		$SaveImagePath = Quiet @ NotebookDirectory[];
-		If[!DirectoryQ[$SaveImagePath],
+		If[FailureQ[$SaveImagePath],
 			Message[saveImg::nosave];
 		];
 	];
 	Export[
 		FileNameJoin[{
 			$SaveImagePath,
-			ToString[SymbolName[Unevaluated@g]] <> ext
+			ToString[SymbolName[Unevaluated @ g]] <> ext
 		}], g, 
 	ImageSize -> OptionValue[ImageSize]];
 );
