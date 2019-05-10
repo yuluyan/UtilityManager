@@ -78,12 +78,13 @@ PackageExport["read"]
 
 read::usage="Read data from Mathematica file.";
 read::nonexist="Data not exist.";
+read::nosave = "Please save the notebook first.";
 
 SetAttributes[read, HoldFirst];
 read[data_]:= Module[{nbdir, dir, name, path},
 	nbdir = Quiet @ NotebookDirectory[];
 	If[FailureQ[$SaveImagePath],
-		Message[save::nosave];
+		Message[read::nosave];
 		Return[$Failed];
 	];
 	dir = FileNameJoin[{nbdir, "data_" <> FileBaseName[NotebookFileName[]]}];
