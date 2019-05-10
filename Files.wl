@@ -11,7 +11,7 @@ $SaveImagePath = Quiet @ NotebookDirectory[];
 PackageExport["saveImg"]
 
 saveImg::usage = "Saving image to img file.";
-saveImg::nosave = "Please specify the location to save or save the notebook.";
+saveImg::nosave = "Please specify the location to save or save the notebook to have default location.";
 
 SetAttributes[saveImg, HoldFirst];
 Options[saveImg] = {ImageSize -> Automatic};
@@ -20,6 +20,7 @@ saveImg[g_, ext_, OptionsPattern[]] := (
 		$SaveImagePath = Quiet @ NotebookDirectory[];
 		If[FailureQ[$SaveImagePath],
 			Message[saveImg::nosave];
+			Return[$Failed];
 		];
 	];
 	Export[
@@ -53,11 +54,17 @@ PackageExport["save"]
 
 save::usage="Save data to Mathematica file.";
 save::exist="Already saved. Set over write to True to overwrite.";
+save::nosave = "Please save the notebook first.";
 
 SetAttributes[save, HoldFirst];
-save[data_, overwrite_:False] := Module[{dir, name, path},
-	dir = FileNameJoin[{NotebookDirectory[], "data_" <> FileBaseName[NotebookFileName[]]}];
-	name = ToString[SymbolName[Unevaluated@data]] <> ".mx";
+save[data_, overwrite_:False] := Module[{nbdir, dir, name, path},
+	nbdir = Quiet @ NotebookDirectory[];
+	If[FailureQ[$SaveImagePath],
+		Message[save::nosave];
+		Return[$Failed];
+	];
+	dir = FileNameJoin[{nbdir, "data_" <> FileBaseName[NotebookFileName[]]}];
+	name = ToString[SymbolName[Unevaluated @ data]] <> ".mx";
 	path = FileNameJoin[{dir, name}];
 	If[!DirectoryQ[dir],CreateDirectory[dir]];
 	If[overwrite || (!FileExistsQ[path]),
@@ -73,9 +80,14 @@ read::usage="Read data from Mathematica file.";
 read::nonexist="Data not exist.";
 
 SetAttributes[read, HoldFirst];
-read[data_]:= Module[{dir, name, path},
-	dir = FileNameJoin[{NotebookDirectory[], "data_" <> FileBaseName[NotebookFileName[]]}];
-	name = ToString[SymbolName[Unevaluated@data]] <> ".mx";
+read[data_]:= Module[{nbdir, dir, name, path},
+	nbdir = Quiet @ NotebookDirectory[];
+	If[FailureQ[$SaveImagePath],
+		Message[save::nosave];
+		Return[$Failed];
+	];
+	dir = FileNameJoin[{nbdir, "data_" <> FileBaseName[NotebookFileName[]]}];
+	name = ToString[SymbolName[Unevaluated @ data]] <> ".mx";
 	path = FileNameJoin[{dir, name}];
 	If[FileExistsQ[path],
 		Get[path],
