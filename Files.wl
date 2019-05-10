@@ -5,7 +5,7 @@ Package["UtilityManager`"]
 
 PackageExport["$SaveImagePath"]
 
-$SaveImagePath = NotebookDirectory[];
+$SaveImagePath = Quiet @ NotebookDirectory[];
 
 
 PackageExport["saveImg"]
@@ -13,13 +13,18 @@ PackageExport["saveImg"]
 saveImg::usage = "Saving image to PNG file.";
 
 SetAttributes[saveImg, HoldFirst];
-saveImg[g_, ext_:".png", imgsize_:1000] := 
+Options[saveImg] = {ImageSize -> Automatic};
+saveImg[g_, ext_:".png", OptionsPattern[]] := (
+	If[!DirectoryQ[$SaveImagePath], 
+		$SaveImagePath = NotebookDirectory[];
+	];
 	Export[
 		FileNameJoin[{
 			$SaveImagePath,
 			ToString[SymbolName[Unevaluated@g]] <> ext
 		}], g, 
-	ImageSize -> imgsize];
+	ImageSize -> OptionValue[ImageSize]];
+);
 
 
 PackageExport["save"]
