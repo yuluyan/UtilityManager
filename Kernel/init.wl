@@ -36,13 +36,43 @@ initUM[] := (
 	createInContext["UtilityManager`", $public];
 	createInContext["UtilityManager`Private`", $private];
 
-	(* introduce helper to make it easy to reload a single file *)
+	(* helper to reload a single file *)
 	UtilityManager`ReloadFile[subpath_] := Block[
 		{$ContextPath = $contexts},
 		Unprotect @@ $umSymbols;
 		loadFile @ FileNameJoin[{$basePath, subpath}];
 		Get @ FileNameJoin[{$basePath, subpath}];
 		Protect @@ $umSymbols;
+	];
+	
+	(* update from github *)
+	UtilityManager`UpdateUtility[] := Module[
+		{localVer, json, latest, tmpDir, target, files},
+		Check[
+			localVer = Import[FileNameJoin[{$basePath, "latest.sha"}], "Text"];
+			json = Import["https://api.github.com/repos/yuluyan/UtilityManager/commits", "JSON"];
+			latest = Lookup[First @ json, "sha"];
+	
+			If[localVer != latest,
+				tmpDir = CreateDirectory[];
+				target = FileNameJoin[{tmpDir, "UtilityManagerUpdate.zip"}];
+				If[$Notebooks,
+					PrintTemporary @ Labeled[ProgressIndicator[Appearance -> "Necklace"], "Updating UtilityManager...", Right], 
+					Print["Updating UtilityManager..."]
+				];
+				URLSave["https://github.com/yuluyan/UtilityManager/archive/master.zip", target];
+				ExtractArchive[target, tmpDir];
+				target = FileNameJoin[{tmpDir, "UtilityManager-master"}];
+				files = Select[FileNames[All, target, Infinity] ,GeneralUtilities`FileQ];
+				CopyFile[#, 
+					FileNameJoin[{$basePath, FileNameTake[#, FileNameDepth[target] - FileNameDepth[#]]}],
+					OverwriteTarget -> True
+				]& /@ files;
+				Export[FileNameJoin[{$basePath, "latest.sha"}], latest, "Text"];
+			];
+		,
+			Return[$Failed]
+		];
 	];
 
 	fileContext[file_] := Block[{dir, base},
