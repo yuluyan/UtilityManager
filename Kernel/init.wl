@@ -16,9 +16,16 @@ General::umloaderr="Could not load the utility functions.";
 
 $basePath = DirectoryName[$InputFileName, 2];
 
+(*Change this for yourself*)
+$githubUser = "yuluyan";
+$githubRepo = "UtilityManager";
+
+$commitsURL = "https://api.github.com/repos/" <> $githubUser <> "/" <> $githubRepo <> "/commits";
+$downloadURL = "https://github.com/" <> $githubUser <> "/" <> $githubRepo <> "/archive/master.zip";
+
 (* update from github *)
 checkUpdate[] := Module[{verFile, localVer, json, latest},
-	json = Import["https://api.github.com/repos/yuluyan/UtilityManager/commits", "JSON"];
+	json = Import[$commitsURL, "JSON"];
 	latest = Lookup[First @ json, "sha"];
 	verFile = FileNameJoin[{$basePath, "latest.sha"}];
 	{If[!FileExistsQ[verFile], True,
@@ -36,7 +43,7 @@ updateUtility[] := Module[
 			PrintTemporary @ Labeled[ProgressIndicator[Appearance -> "Necklace"], "Updating UtilityManager...", Right], 
 			Print["Updating UtilityManager..."]
 		];
-		URLSave["https://github.com/yuluyan/UtilityManager/archive/master.zip", target];
+		URLSave[$downloadURL, target];
 		ExtractArchive[target, tmpDir];
 		target = FileNameJoin[{tmpDir, "UtilityManager-master"}];
 		allfiles = FileNames[All, target];
@@ -67,7 +74,7 @@ UtilityManager`UpdateUtility[] := Module[{needUpdate, version},
 	];
 ];
 
-initUM[] := (
+initializeManager[] := (
 	(* obtain files to load *)
 	subPath[p__] := FileNameJoin[{$basePath, p}];
 	$allFiles = Select[FileNames["*.wl", $basePath, Infinity], GeneralUtilities`FileQ];
@@ -133,7 +140,7 @@ initUM[] := (
 
 UtilityManager`UpdateUtility[];
 
-initUM[];
+initializeManager[];
 
 Scan[Get, $files];
 
