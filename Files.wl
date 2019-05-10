@@ -10,13 +10,17 @@ $SaveImagePath = Quiet @ NotebookDirectory[];
 
 PackageExport["saveImg"]
 
-saveImg::usage = "Saving image to PNG file.";
+saveImg::usage = "Saving image to img file.";
+saveImg::nosave = "Please specify the location to save or save the notebook.";
 
 SetAttributes[saveImg, HoldFirst];
 Options[saveImg] = {ImageSize -> Automatic};
-saveImg[g_, ext_:".png", OptionsPattern[]] := (
+saveImg[g_, ext_:, OptionsPattern[]] := (
 	If[!DirectoryQ[$SaveImagePath], 
-		$SaveImagePath = NotebookDirectory[];
+		$SaveImagePath = Quiet @ NotebookDirectory[];
+		If[!DirectoryQ[$SaveImagePath],
+			Message[saveImg::nosave];
+		];
 	];
 	Export[
 		FileNameJoin[{
@@ -25,6 +29,24 @@ saveImg[g_, ext_:".png", OptionsPattern[]] := (
 		}], g, 
 	ImageSize -> OptionValue[ImageSize]];
 );
+
+PackageExport["savePNG"]
+
+savePNG::usage = "Saving image to .png file.";
+
+SetAttributes[savePNG, HoldFirst];
+Options[savePNG] = {ImageSize -> Automatic};
+savePNG[g_,  OptionsPattern[]] :=
+	saveImg[g, ".png", ImageSize -> OptionValue[ImageSize]];
+	
+PackageExport["savePDF"]
+
+savePDF::usage = "Saving image to .pdf file.";
+
+SetAttributes[savePDF, HoldFirst];
+Options[savePDF] = {ImageSize -> Automatic};
+savePDF[g_,  OptionsPattern[]] :=
+	saveImg[g, ".pdf", ImageSize -> OptionValue[ImageSize]];
 
 
 PackageExport["save"]
