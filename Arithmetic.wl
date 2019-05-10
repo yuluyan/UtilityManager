@@ -13,10 +13,10 @@ minAndPosCompiled = Compile[{{list, _Real, 1}},
 			If[min > list[[i]], min = list[[idx = i]]],
 		{i, 2, len}];
 	{idx, min}
-	], RuntimeOptions-> "Speed"
+	], CompilationTarget -> "C", RuntimeOptions-> "Speed"
 ];
 
-MinAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[minAndPosCompiled[list]];
+MinAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}& [minAndPosCompiled[list]];
 
 
 PackageExport["MaxAndPosition"]
@@ -30,7 +30,7 @@ maxAndPosCompiled = Compile[{{list, _Real, 1}},
 			If[max < list[[i]], max = list[[idx = i]]],
 		{i, 2, len}];
 	{idx, max}
-	], RuntimeOptions-> "Speed"
+	], CompilationTarget -> "C", RuntimeOptions-> "Speed"
 ];
 
-MaxAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[maxAndPosCompiled[list]];
+MaxAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}& [maxAndPosCompiled[list]];
