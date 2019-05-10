@@ -15,7 +15,7 @@ saveImg::nosave = "Please specify the location to save or save the notebook.";
 
 SetAttributes[saveImg, HoldFirst];
 Options[saveImg] = {ImageSize -> Automatic};
-saveImg[g_, ext_:, OptionsPattern[]] := (
+saveImg[g_, ext_, OptionsPattern[]] := (
 	If[!DirectoryQ[$SaveImagePath], 
 		$SaveImagePath = Quiet @ NotebookDirectory[];
 		If[!DirectoryQ[$SaveImagePath],
