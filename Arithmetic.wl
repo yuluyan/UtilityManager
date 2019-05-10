@@ -13,7 +13,7 @@ minAndPosCompiledReal = Compile[{{list, _Real, 1}},
 			If[min > list[[i]], min = list[[idx = i]]],
 		{i, 2, len}];
 	{idx, min}
-	], CompilationTarget -> "C", RuntimeOptions-> "Speed"
+	], CompilationTarget -> "C", RuntimeOptions -> "Speed"
 ];
 
 MinAndPosition[list_] := {IntegerPart[#[[1]]], #[[2]]}&[minAndPosCompiled[list]];

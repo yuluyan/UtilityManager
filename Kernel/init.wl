@@ -27,7 +27,7 @@ $downloadURL = "https://github.com/" <> $githubUser <> "/" <> $githubRepo <> "/a
 checkUpdate::timeout = "Update checking timed out, please try again.";
 checkUpdate[] := Module[{verFile, localVer, json, latest},
 	json = TimeConstrained[
-		Import[$commitsURL,"JSON"], 0.1,
+		Import[$commitsURL,"JSON"], 1,
 		Message[checkUpdate::timeout]; Return[{False, ""}]
 	];
 	latest = Lookup[First @ json, "sha"];
@@ -141,6 +141,7 @@ initializeManager[] := (
 	];
 
 );
+
 
 UtilityManager`UpdateUtility[];
 
