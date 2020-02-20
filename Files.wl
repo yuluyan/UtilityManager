@@ -27,7 +27,7 @@ saveImg[g_, ext_, OptionsPattern[]] := (
 		FileNameJoin[{
 			$SaveImagePath,
 			If[StringQ[OptionValue[FileName]],
-				OptionValue[FileName],
+				OptionValue[FileName] <> ext,
 				ToString[SymbolName[Unevaluated @ g]] <> ext
 			]
 		}], g, 
