@@ -25,4 +25,4 @@ StepEvaluate[expr_] :=
   
 PackageExport["StyledStringJoin"]
 StyledStringJoin::usage = "Join string with possibly styles.";
-StyledStringJoin[s__] := StringJoin @@ (ToString[#, StandardForm]& /@ s)
+StyledStringJoin[s__] := StringJoin @@ (ToString[#, StandardForm]& /@ {s})
