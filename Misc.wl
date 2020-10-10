@@ -65,14 +65,15 @@ StyledString[str_] := Module[
 		"sz"->(FontSize->ToExpression[#1]&),
 		"rgb"->(RGBColor[#1]&)
 	|>;
-	replaceDeclaratives[dec_]:=Module[{x, cmd, args},
+	replaceDeclaratives[dec_]:=Module[{x, cmd, args, res},
 		Table[
 			If[MemberQ[Keys[simpleCommands],d], 
 				d/.simpleCommands,
 				If[StringContainsQ[d,"["~~__~~"]"],
 					cmd = StringSplit[d, "["][[1]];
 					args = StringSplit[StringCases[d, "["~~ x___ ~~"]" -> x][[1]], ","];
-					Evaluate[argumentCommands[cmd]@@args]
+					res = Evaluate[argumentCommands[cmd]@@args];
+					res
 				,
 				Message[StyledString::syntxerr1,d];Nothing
 				]
