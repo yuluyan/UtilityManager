@@ -27,39 +27,109 @@ PackageExport["StyledStringJoin"]
 StyledStringJoin::usage = "Join string with possibly styles.";
 StyledStringJoin[s__] := StringJoin @@ (ToString[#, StandardForm]& /@ {s})
 
+
 PackageExport["StyledString"]
-StyledString::syntxerr="";
-StyledString[str_]:=Module[{l={},sub={},n,i,chars,flag={},depth=0,map},
-map={
-"it"->Italic,
-"bd"->Bold,
-"math"->{(FontFamily->"Times New Roman"),Italic}
-};
-n=StringLength[str];
-chars=Characters[str];
-For[i=1,i<=n,i++,
-Switch[chars[[i]],
-"`",
-If[Length[sub]>0,AppendTo[l,
-If[Length[flag]>0,
-Style[StringJoin@@sub,(StringJoin@@flag)/.map],
-StringJoin@@sub
-]
+StyledString::syntxerr = "";
+StyledString::syntxerr1 = "`1` is not a valid text style command.";
+StyledString::syntxerr2 = "Unknown syntax.";
+StyledString[str_] := Module[
+{
+	components={},substring={},len,i,chars,flag={},flagStack={},
+	simpleCommands,argumentCommands,
+	replaceDeclaratives
+},
+	simpleCommands = {
+		"red"->Red,
+		"green"->Green,
+		"blue"->Blue,
+		"black"->Black,
+		"white"->White,
+		"gray"->Gray,
+		"cyan"->Cyan,
+		"magenta"->Magenta,
+		"yellow"->Yellow,
+		"brown"->Brown,
+		"orange"->Orange,
+		"pink"->Pink,
+		"purple"->Purple,
+		
+		"bd"->Bold,
+		"it"->Italic,
+		"ul"->Underlined,
+		"lg"->Larger,
+		"sm"->Smaller,
+		
+		"math"->(FontFamily->"Times New Roman")
+	};
+	argumentCommands = <|
+		"sz"->(FontSize->ToExpression[#1]&),
+		"rgb"->(RGBColor[#1]&)
+	|>;
+	replaceDeclaratives[dec_]:=Module[{x, cmd, args},
+		Table[
+			If[MemberQ[Keys[simpleCommands],d], 
+				d/.simpleCommands,
+				If[StringContainsQ[d,"["~~__~~"]"],
+					cmd = StringSplit[d, "["][[1]];
+					args = StringSplit[StringCases[d, "["~~ x___ ~~"]" -> x][[1]], ","];
+					Evaluate[argumentCommands[cmd]@@args]
+				,
+				Message[StyledString::syntxerr1,d];Nothing
+				]
+			],
+			{d, dec}
+		]
+	];
+	len = StringLength[str];
+	chars = Characters[str];
+	For[i = 1, i <= len, i++,
+		Switch[chars[[i]],
+			"`",
+			If[i == len, 
+				Message[StyledString::syntxerr2],
+				If[chars[[i + 1]] == "`",
+					AppendTo[substring, "`"];
+					i = i + 1;
+					,
+					If[Length[substring] > 0,
+						AppendTo[components,
+							If[Length[flagStack]>0,
+								Style[StringJoin @@ substring, replaceDeclaratives @ flagStack],
+								StringJoin @@ substring
+								]
+						];
+						substring = {};
+					];
+					i++;
+					While[chars[[i]] != "{",
+						AppendTo[flag, chars[[i]]];
+						i++;
+					];
+					i--;
+				]
+			];
+			,
+			"{",
+			If[Length[flag] > 0,
+				AppendTo[flagStack, StringJoin @@ flag];
+				flag = {};
+			];
+			,
+			"}",
+			AppendTo[components,
+				If[Length[flagStack] > 0,
+					Style[StringJoin @@ substring, replaceDeclaratives @ flagStack],
+					StringJoin @@ substring
+				]
+			];
+			If[Length[flagStack] > 0, 
+				flagStack = Delete[flagStack, -1];
+			];
+			flag = {};
+			substring = {},
+			_,
+			AppendTo[substring, chars[[i]]];
+		]
+	];
+	StyledStringJoin @@ components
 ];
-sub={}];i++;While[chars[[i]]!="{",AppendTo[flag,chars[[i]]];i++;]
-,
-"{",
-1
-,
-"}",
-AppendTo[l,If[Length[flag]>0,
-Style[StringJoin@@sub,(StringJoin@@flag)/.map],
-StringJoin@@sub
-]];flag={};sub={},
-_,
-AppendTo[sub,chars[[i]]];
-]
-];
-StyledStringJoin@@l
-];
-StyledString["moment of `math{x}"]
