@@ -28,11 +28,14 @@ StyledStringJoin::usage = "Join string with possibly styles.";
 StyledStringJoin[s__] := StringJoin @@ (ToString[#, StandardForm]& /@ {s})
 
 
+PackageExport["$StyledStringTest"]
+$StyledStringTest = "`red{red}`green{green}`blue{blue}`black{black}`white{white}`gray{gray}`cyan{cyan}`magenta{magenta}`yellow{yellow}`brown{brown}`orange{orange}`pink{pink}`purple{purple}`bd{bold}`it{italic}`ul{underline}`lg{larger}`sm{smaller}`math{math}`sz[25]{size25}`rgb[#12ee2e]{rgb12ee2e}`red{`it{`math{`sz[25]{recursive}}}}";
+
 PackageExport["StyledString"]
 StyledString::syntxerr = "";
 StyledString::syntxerr1 = "`1` is not a valid text style command.";
 StyledString::syntxerr2 = "Unknown syntax.";
-StyledString[str_] := Module[
+StyledString[str_, commandSep_:"`"] := Module[
 {
 	components={},substring={},len,i,chars,flag={},flagStack={},
 	simpleCommands,argumentCommands,
@@ -85,16 +88,16 @@ StyledString[str_] := Module[
 	chars = Characters[str];
 	For[i = 1, i <= len, i++,
 		Switch[chars[[i]],
-			"`",
+			commandSep,
 			If[i == len, 
 				Message[StyledString::syntxerr2],
-				If[chars[[i + 1]] == "`",
+				If[chars[[i + 1]] == commandSep,
 					AppendTo[substring, "`"];
 					i = i + 1;
 					,
 					If[Length[substring] > 0,
 						AppendTo[components,
-							If[Length[flagStack]>0,
+							If[Length[flagStack] > 0,
 								Style[StringJoin @@ substring, replaceDeclaratives @ flagStack],
 								StringJoin @@ substring
 								]
