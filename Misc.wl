@@ -135,6 +135,7 @@ StyledString[str_, commandSep_:"`"] := Module[
 			AppendTo[substring, chars[[i]]];
 		];
 	];
+	
 	If[Length[substring] > 0,
 		AppendTo[components,
 			If[Length[flagStack] > 0,
@@ -143,5 +144,6 @@ StyledString[str_, commandSep_:"`"] := Module[
 			]
 		];
 	];
+	
 	StyledStringJoin @@ components
 ];
