@@ -134,13 +134,13 @@ StyledString[str_, commandSep_:"`"] := Module[
 			_,
 			AppendTo[substring, chars[[i]]];
 		];
-		If[Length[substring] > 0,
-			AppendTo[components,
-				If[Length[flagStack] > 0,
-					Style[StringJoin @@ substring, replaceDeclaratives @ flagStack],
-					StringJoin @@ substring
-				]
-			];
+	];
+	If[Length[substring] > 0,
+		AppendTo[components,
+			If[Length[flagStack] > 0,
+				Style[StringJoin @@ substring, replaceDeclaratives @ flagStack],
+				StringJoin @@ substring
+			]
 		];
 	];
 	StyledStringJoin @@ components
